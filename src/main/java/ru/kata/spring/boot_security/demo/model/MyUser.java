@@ -51,7 +51,6 @@ public class MyUser implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
 
-//    @JsonManagedReference
     private Set<Role> roles = new HashSet<>();
 
     @Override

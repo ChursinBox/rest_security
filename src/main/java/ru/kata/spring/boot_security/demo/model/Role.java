@@ -19,7 +19,6 @@ public class Role implements GrantedAuthority {
     private String roleName;
 
     @ManyToMany(mappedBy = "roles")
-//    @JsonBackReference
     @JsonIgnore
     private Set<MyUser> users;
 

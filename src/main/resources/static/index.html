@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management</title>
-    <!-- Подключаем Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -24,12 +23,12 @@
         </tr>
         </thead>
         <tbody id="usersTableBody">
-        <!-- Данные будут вставлены здесь -->
+
         </tbody>
     </table>
 </div>
 
-<!-- Модальное окно для добавления/редактирования пользователя -->
+
 <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -60,7 +59,6 @@
                     <div class="form-group">
                         <label for="role">Role</label>
                         <select class="form-control" id="role">
-                            <!-- Опции будут добавлены через JavaScript -->
                         </select>
                     </div>
                 </form>
@@ -73,133 +71,11 @@
     </div>
 </div>
 
-<!-- Подключаем Bootstrap JS и зависимости -->
+
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-    let currentUserId = null;
-    let roles = []; // Глобальный массив для хранения ролей
+<script src="script.js"></script>
 
-    // Загрузка ролей при открытии страницы
-    function fetchRoles() {
-        fetch('/api/roles')
-            .then(response => response.json())
-            .then(data => {
-                roles = data; // Сохраняем роли в глобальной переменной
-            });
-    }
-
-    // Загрузка данных при открытии страницы
-    $(document).ready(function() {
-        fetchUsers();
-        fetchRoles(); // Загружаем роли
-    });
-
-    // Функция для получения и отображения пользователей
-    function fetchUsers() {
-        fetch('/api/all')
-            .then(response => response.json())
-            .then(users => {
-                const tbody = document.getElementById('usersTableBody');
-                tbody.innerHTML = ''; // Очистка таблицы
-                users.forEach(user => {
-                    const row = `<tr>
-                            <td>${user.id}</td>
-                            <td>${user.username}</td>
-                            <td>${user.age}</td>
-                            <td>${user.email}</td>
-                            <td>${user.password}</td>
-                            <td>${user.roles.map(role => role.roleName).join(', ')}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="openEditUserModal(${user.id})">Edit</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Delete</button>
-                            </td>
-                        </tr>`;
-                    tbody.innerHTML += row;
-                });
-            });
-    }
-
-    // Открытие модального окна для добавления пользователя
-    function openAddUserModal() {
-        currentUserId = null;
-        $('#username').val('');
-        $('#age').val('');
-        $('#email').val('');
-        $('#password').val('');
-        $('#role').empty(); // Очищаем выпадающий список
-        roles.forEach(role => {
-            $('#role').append(new Option(role.roleName, role.id));
-        });
-        $('#userModal').modal('show');
-    }
-
-    // Открытие модального окна для редактирования пользователя
-    function openEditUserModal(userId) {
-        currentUserId = userId;
-        fetch(`/api/all/${userId}`)
-            .then(response => response.json())
-            .then(user => {
-                $('#username').val(user.username);
-                $('#age').val(user.age);
-                $('#email').val(user.email);
-                $('#password').val('');
-
-                // Заполняем выпадающий список ролями
-                const roleSelect = $('#role');
-                roleSelect.empty();
-                roles.forEach(role => {
-                    const option = new Option(role.roleName, role.id);
-                    if (user.roles.some(userRole => userRole.id === role.id)) {
-                        option.selected = true; // Выбираем текущую роль пользователя
-                    }
-                    roleSelect.append(option);
-                });
-
-                $('#userModal').modal('show');
-            });
-    }
-
-    // Отправка данных формы
-    function submitUserForm() {
-        const user = {
-            username: $('#username').val(),
-            age: $('#age').val(),
-            email: $('#email').val(),
-            password: $('#password').val(),
-            roles: [{ id: $('#role').val() }] // Отправляем выбранную роль
-        };
-
-        const method = currentUserId ? 'PUT' : 'POST';
-        const url = currentUserId ? `/api/all/${currentUserId}` : '/api/all';
-
-        fetch(url, {
-            method: method,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(user)
-        })
-            .then(response => {
-                if (response.ok) {
-                    fetchUsers(); // Обновление таблицы
-                    $('#userModal').modal('hide');
-                }
-            });
-    }
-
-    // Удаление пользователя
-    function deleteUser(userId) {
-        if (confirm('Are you sure you want to delete this user?')) {
-            fetch(`/api/all/${userId}`, { method: 'DELETE' })
-                .then(response => {
-                    if (response.ok) {
-                        fetchUsers(); // Обновление таблицы
-                    }
-                });
-        }
-    }
-</script>
 </body>
 </html>
