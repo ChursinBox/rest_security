@@ -57,26 +57,28 @@ public class AdminController {
     @PatchMapping("/{id}")
     public String editUser(@PathVariable int id, @ModelAttribute MyUser updatedUser) {
 
-        MyUser existingUser = myUserService.showById(id);
+        myUserService.update(id, updatedUser);
 
-        if (updatedUser.getUsername() != null) {
-            existingUser.setUsername(updatedUser.getUsername());
-        }
-        if (updatedUser.getAge() != 0) {
-            existingUser.setAge(updatedUser.getAge());
-        }
-        if (updatedUser.getEmail() != null) {
-            existingUser.setEmail(updatedUser.getEmail());
-        }
-        if (!updatedUser.getPassword().equals(existingUser.getPassword())) {
-            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        }
-
-        if (updatedUser.getRoles() != null) {
-            existingUser.setRoles(updatedUser.getRoles());
-        }
-
-        myUserRepository.save(existingUser);
+//        MyUser existingUser = myUserService.showById(id);
+//
+//        if (updatedUser.getUsername() != null) {
+//            existingUser.setUsername(updatedUser.getUsername());
+//        }
+//        if (updatedUser.getAge() != 0) {
+//            existingUser.setAge(updatedUser.getAge());
+//        }
+//        if (updatedUser.getEmail() != null) {
+//            existingUser.setEmail(updatedUser.getEmail());
+//        }
+//        if (!updatedUser.getPassword().equals(existingUser.getPassword())) {
+//            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+//        }
+//
+//        if (updatedUser.getRoles() != null) {
+//            existingUser.setRoles(updatedUser.getRoles());
+//        }
+//
+//        myUserRepository.save(existingUser);
 
         return "redirect:/admin/all";
     }

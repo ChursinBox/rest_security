@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api")
-public class MyRestController {
+@RequestMapping("/api/users")
+public class MyUserRestController {
 
     private final MyUserServiceImpl myUserService;
     private final PasswordEncoder passwordEncoder;
@@ -27,29 +27,26 @@ public class MyRestController {
 
 
     @Autowired
-    public MyRestController(MyUserServiceImpl myUserService, PasswordEncoder passwordEncoder, RegistrationService registrationService, RoleRepository roleRepository) {
+    public MyUserRestController(MyUserServiceImpl myUserService, PasswordEncoder passwordEncoder, RegistrationService registrationService, RoleRepository roleRepository) {
         this.myUserService = myUserService;
         this.passwordEncoder = passwordEncoder;
         this.registrationService = registrationService;
         this.roleRepository = roleRepository;
     }
 
-    @GetMapping("/all")
-    @ResponseBody
-    public List<MyUserDTO> getPeopleJson() {
+    @GetMapping
+    public List<MyUserDTO> getUser() {
         return myUserService.showAll().stream().map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/all/{id}")
-    @ResponseBody
+    @GetMapping("/{id}")
     public MyUserDTO showByIdJson(@PathVariable int id) {
         return toDTO(myUserService.showById(id));
     }
 
-    @PostMapping("/all")
-    @ResponseBody
-    public ResponseEntity<HttpStatus> createUserJson(@RequestBody MyUser user) {
+    @PostMapping
+    public ResponseEntity<HttpStatus> createUser(@RequestBody MyUser user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Collections.singleton(roleRepository.findByRoleName("ROLE_USER")));
         registrationService.register(user);
@@ -57,33 +54,15 @@ public class MyRestController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PutMapping("/all/{id}")
-    public ResponseEntity<HttpStatus> update(@PathVariable int id, @RequestBody MyUser user) {
+    @PutMapping("/{id}")
+    public ResponseEntity<HttpStatus> updateUser(@PathVariable int id, @RequestBody MyUser user) {
 
-        MyUser updateUser = myUserService.showById(id);
+        myUserService.update(id, user);
 
-        if (user.getUsername() != null) {
-            updateUser.setUsername(user.getUsername());
-        }
-        if (user.getAge() != 0) {
-            updateUser.setAge(user.getAge());
-        }
-        if (user.getEmail() != null) {
-            updateUser.setEmail(user.getEmail());
-        }
-        if (!user.getPassword().equals(updateUser.getPassword())) {
-            updateUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        }
-        if (user.getRoles() != null) {
-            updateUser.setRoles(user.getRoles());
-        }
-
-        myUserService.save(updateUser);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @DeleteMapping("/all/{id}")
-    @ResponseBody
+    @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable int id) {
         myUserService.deleteById(id);
     }
@@ -101,7 +80,6 @@ public class MyRestController {
     }
 
     @GetMapping("/roles")
-    @ResponseBody
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }

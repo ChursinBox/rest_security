@@ -2,7 +2,7 @@ let currentUserId = null;
 let roles = [];
 
 function fetchRoles() {
-    fetch('/api/roles')
+    fetch('/api/users/roles')
         .then(response => response.json())
         .then(data => {
             roles = data;
@@ -15,7 +15,7 @@ $(document).ready(function() {
 });
 
 function fetchUsers() {
-    fetch('/api/all')
+    fetch('/api/users')
         .then(response => response.json())
         .then(users => {
             const tbody = document.getElementById('usersTableBody');
@@ -53,7 +53,7 @@ function openAddUserModal() {
 
 function openEditUserModal(userId) {
     currentUserId = userId;
-    fetch(`/api/all/${userId}`)
+    fetch(`/api/users/${userId}`)
         .then(response => response.json())
         .then(user => {
             $('#username').val(user.username);
@@ -85,7 +85,7 @@ function submitUserForm() {
     };
 
     const method = currentUserId ? 'PUT' : 'POST';
-    const url = currentUserId ? `/api/all/${currentUserId}` : '/api/all';
+    const url = currentUserId ? `/api/users/${currentUserId}` : '/api/users';
 
     fetch(url, {
         method: method,
@@ -104,7 +104,7 @@ function submitUserForm() {
 
 function deleteUser(userId) {
     if (confirm('Are you sure you want to delete this user?')) {
-        fetch(`/api/all/${userId}`, { method: 'DELETE' })
+        fetch(`/api/users/${userId}`, { method: 'DELETE' })
             .then(response => {
                 if (response.ok) {
                     fetchUsers();
